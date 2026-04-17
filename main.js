@@ -12,6 +12,7 @@
  * - Handle multiple textShape entries
  */
 
+const { entrypoints } = require("uxp");
 const { action, core } = require("photoshop");
 const { batchPlay } = action;
 
@@ -155,16 +156,15 @@ function normalizeHorizontalTransformInDescriptor(descriptor) {
   };
 }
 
-async function applyNormalizedDescriptor(layerId, textKey) {
+async function applyNormalizedDescriptor(layerId, nextTextKey) {
   const result = await batchPlay(
     [
       {
         _obj: "set",
         _target: [{ _ref: "textLayer", _id: layerId }],
-        to: {
-          _obj: "textLayer",
-          textKey,
-        },
+        // `nextTextKey` is already the text layer descriptor shape (`descriptor.textKey`).
+        // Avoid wrapping it again as `{ _obj: "textLayer", textKey: ... }`.
+        to: nextTextKey,
       },
     ],
     {
@@ -187,9 +187,12 @@ async function runNormalizeHorizontalCommand() {
       return normalized;
     }
 
-    await core.executeAsModal(async () => {
-      await applyNormalizedDescriptor(layerId, normalized.textKey);
-    }, { commandName: "Normalize Horizontal Transform" });
+    await core.executeAsModal(
+      async () => {
+        await applyNormalizedDescriptor(layerId, normalized.textKey);
+      },
+      { commandName: "Normalize Horizontal Transform" }
+    );
 
     console.log("[normalize] success");
     return normalized;
@@ -199,6 +202,12 @@ async function runNormalizeHorizontalCommand() {
     throw error;
   }
 }
+
+entrypoints.setup({
+  commands: {
+    runNormalizeHorizontalCommand,
+  },
+});
 
 module.exports = {
   safeStringify,

@@ -1,0 +1,20 @@
+{
+  "manifestVersion": 5,
+  "id": "com.example.psd-text-test2",
+  "name": "PSD Text Test2",
+  "version": "1.0.0",
+  "main": "main.js",
+  "host": {
+    "app": "PS",
+    "minVersion": "23.0.0"
+  },
+  "entrypoints": [
+    {
+      "type": "command",
+      "id": "runNormalizeHorizontalCommand",
+      "label": {
+        "default": "Normalize Horizontal Transform"
+      }
+    }
+  ]
+}
